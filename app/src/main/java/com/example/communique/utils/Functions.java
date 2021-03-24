@@ -1,11 +1,13 @@
 package com.example.communique.utils;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.database.Cursor;
 import android.provider.ContactsContract;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -84,7 +86,10 @@ public class Functions {
                         contactNumber = contactNumber.replaceAll("\\)", "");
                         contactNumber = contactNumber.replaceAll("-", "");
                         contactNumber = contactNumber.replaceAll(" ", "");
-                        if(!(contactNumber.contains("+91"))){
+                        if (contactNumber.length() > 10) {
+                            contactNumber = contactNumber.substring(contactNumber.length() - 10, contactNumber.length());
+                        }
+                        if (!(contactNumber.contains("+91"))) {
                             contactNumber = "+91" + contactNumber;
                         }
                         Contact newContact = new Contact(
@@ -94,21 +99,24 @@ public class Functions {
                                 "",
                                 contactNumber
                         );
-                        if(!(contactNumber.equals(myDetails.getUserPhone()))){
+                        if (!(contactNumber.equals(myDetails.getUserPhone()))) {
                             contactList.add(newContact);
                         }
                     }
                     phoneCursor.close();
                 }
             }
-            dbHelper.addContactsToDatabase(contactList);
-//            if(Functions.checkFile(Constants.ALL_CONTACTS_FILE, context)){
-//                Functions.deleteFile(Constants.ALL_CONTACTS_FILE, context);
-//            }
-//            Functions.writeFile(contacts.toString(), Constants.ALL_CONTACTS_FILE, context);
+            new Thread(() -> {
+                dbHelper.addContactsToDatabase(contactList);
+            }).start();
         }
         cursor.close();
         return contactList;
+    }
+
+    public static void closeKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
     }
 
     public static boolean writeFile(String data, String filename, Context context) throws IOException {
@@ -132,14 +140,14 @@ public class Functions {
         return sb.toString();
     }
 
-    public static boolean checkFile(String filename, Context context){
+    public static boolean checkFile(String filename, Context context) {
         File dir = context.getFilesDir();
         File file = new File(dir, filename);
         return file.exists();
     }
 
-    public static boolean deleteFile(String filename, Context context){
-        if(checkFile(filename, context)){
+    public static boolean deleteFile(String filename, Context context) {
+        if (checkFile(filename, context)) {
             File dir = context.getFilesDir();
             File file = new File(dir, filename);
             return file.delete();
@@ -147,7 +155,7 @@ public class Functions {
         return false;
     }
 
-    public static ArrayList<String> stringToArray(){
+    public static ArrayList<String> stringToArray() {
         String arr = "[1,2]";
         String[] items = arr.replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\\s", "").split(",");
         return new ArrayList<>(Arrays.asList(items));

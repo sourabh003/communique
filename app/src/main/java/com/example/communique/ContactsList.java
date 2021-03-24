@@ -8,7 +8,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -26,6 +29,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 public class ContactsList extends AppCompatActivity implements View.OnClickListener {
 
@@ -33,10 +37,14 @@ public class ContactsList extends AppCompatActivity implements View.OnClickListe
     RecyclerView contactsRecyclerView;
     ArrayList<String> contactsList = new ArrayList<>();
     ContactListAdapter adapter;
-    ImageView btnBack;
+    ImageView btnBack, btnSearch, btnCloseSearchBar;
     ProgressBar loading;
     ArrayList<String> onlineList;
     DBHelper dbHelper;
+    boolean searchBarOpen = false;
+    EditText searchBar;
+
+    HashMap<String, Contact> allContactsList = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +57,47 @@ public class ContactsList extends AppCompatActivity implements View.OnClickListe
 
         btnBack = findViewById(R.id.btn_back);
         btnBack.setOnClickListener(this);
+        btnSearch = findViewById(R.id.btn_search);
+        btnSearch.setOnClickListener(this);
+        btnCloseSearchBar = findViewById(R.id.btn_close_search_bar);
+        btnCloseSearchBar.setOnClickListener(this);
+        searchBar = findViewById(R.id.text_search_contact);
+        searchBar.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                //NOTHING
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String searchText = String.valueOf(s);
+                List<Contact> searchedList = new ArrayList<>();
+                if (!(searchText.isEmpty())) {
+                    for (String listItem : allContactsList.keySet()) {
+                        if (listItem.contains(searchText)) {
+                            searchedList.add(allContactsList.get(listItem));
+                        }
+                    }
+                    try {
+                        adapter = new ContactListAdapter(searchedList, getApplicationContext());
+                    } catch (JSONException | IOException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    try {
+                        adapter = new ContactListAdapter(new ArrayList<>(allContactsList.values()), getApplicationContext());
+                    } catch (JSONException | IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                contactsRecyclerView.setAdapter(adapter);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                //NOTHING
+            }
+        });
 
         loading = findViewById(R.id.loading);
 
@@ -59,18 +108,17 @@ public class ContactsList extends AppCompatActivity implements View.OnClickListe
     protected void onStart() {
         super.onStart();
         Functions.showLoading(loading, true);
-        if(dbHelper.getContactsCount() != 0){
+        if (dbHelper.getContactsCount() != 0) {
             getContactsFromBackup();
         } else {
             getContacts();
         }
-        Functions.showLoading(loading, false);
     }
 
-    private void getContactsFromBackup(){
+    private void getContactsFromBackup() {
         try {
             List<Contact> localContacts = dbHelper.getContacts();
-            if(localContacts.size() == Functions.getContactsCount(getApplicationContext())){
+            if (localContacts.size() == Functions.getContactsCount(getApplicationContext())) {
                 loadContactsInList(localContacts);
             } else {
                 getContacts();
@@ -85,7 +133,7 @@ public class ContactsList extends AppCompatActivity implements View.OnClickListe
             // You can use the API that requires the permission.
             try {
                 loadContactsInList(Functions.getContactsFomPhone(getApplicationContext()));
-            } catch (Exception e){
+            } catch (Exception e) {
                 Toast.makeText(this, "Exception => " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         } else {
@@ -95,8 +143,15 @@ public class ContactsList extends AppCompatActivity implements View.OnClickListe
     }
 
     private void loadContactsInList(List<Contact> contactList) throws JSONException, IOException {
+        new Thread(() -> {
+            for (Contact contact : contactList) {
+                allContactsList.put(contact.getContactName(), contact);
+            }
+        }).start();
         adapter = new ContactListAdapter(contactList, this);
         contactsRecyclerView.setAdapter(adapter);
+        Functions.showLoading(loading, false);
+        contactsRecyclerView.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -109,7 +164,7 @@ public class ContactsList extends AppCompatActivity implements View.OnClickListe
                     // Permission is granted. Continue the action or workflow
                     // in your app.
                     getContacts();
-                }  else {
+                } else {
                     Toast.makeText(this, "We cannot import Contacts without this permission", Toast.LENGTH_SHORT).show();
                 }
                 return;
@@ -118,8 +173,40 @@ public class ContactsList extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        if(v.getId() == R.id.btn_back){
+        switch (v.getId()) {
+            case R.id.btn_back:
+                onBackPressed();
+                break;
+            case R.id.btn_search:
+                showSearchBar(true);
+                break;
+            case R.id.btn_close_search_bar:
+                showSearchBar(false);
+                break;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (searchBarOpen) {
+            showSearchBar(false);
+        } else {
             finish();
+        }
+    }
+
+    private void showSearchBar(boolean show) {
+        if (show) {
+            searchBarOpen = true;
+            btnSearch.setVisibility(View.GONE);
+            btnCloseSearchBar.setVisibility(View.VISIBLE);
+            searchBar.setVisibility(View.VISIBLE);
+        } else {
+            Functions.closeKeyboard(this);
+            searchBarOpen = false;
+            btnSearch.setVisibility(View.VISIBLE);
+            btnCloseSearchBar.setVisibility(View.GONE);
+            searchBar.setVisibility(View.GONE);
         }
     }
 }
