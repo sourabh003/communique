@@ -1,35 +1,21 @@
 package com.example.communique.adapters;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.util.Log;
+import android.media.MediaPlayer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.SortedList;
 
-import com.example.communique.Chat;
 import com.example.communique.R;
 import com.example.communique.helpers.Message;
-import com.example.communique.utils.Constants;
-import com.example.communique.utils.Functions;
-import com.google.firebase.database.core.utilities.Tree;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.TreeMap;
 
 public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ViewHolder> {
@@ -38,11 +24,13 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ViewHo
     Context context;
     String me;
     ArrayList<String> list = new ArrayList<>();
+    boolean startUp;
 
-    public ChatListAdapter(TreeMap<String, Message> messageList, String me, Context context) {
+    public ChatListAdapter(TreeMap<String, Message> messageList, String me, Context context, boolean startUp) {
         this.messageList = messageList;
         this.context = context;
         this.me = me;
+        this.startUp = startUp;
         list.addAll(messageList.keySet());
     }
 
@@ -56,17 +44,25 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        try {
-            Message message = messageList.get(list.get(position));
-            if(message.getMessageTo().equals(me)){
-                holder.recipientMessage.setVisibility(View.VISIBLE);
-                holder.recipientMessage.setText(message.getMessageContent());
-            } else {
-                holder.senderMessage.setVisibility(View.VISIBLE);
-                holder.senderMessage.setText(message.getMessageContent());
+        Message message = messageList.get(list.get(position));
+        Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.bottom_up);
+        MediaPlayer mp = MediaPlayer.create(context, R.raw.ping_sound_effect);
+
+        if (message.getMessageTo().equals(me)) {
+            holder.recipientMessage.setVisibility(View.VISIBLE);
+            holder.recipientMessage.setText(message.getMessageContent());
+            if(position == messageList.size() - 1){
+                if(!startUp){
+                    holder.recipientMessage.startAnimation(fadeInAnimation);
+                    mp.start();
+                }
             }
-        } catch (Exception e){
-            e.printStackTrace();
+        } else {
+            holder.senderMessage.setVisibility(View.VISIBLE);
+            holder.senderMessage.setText(message.getMessageContent());
+            if(position == messageList.size() - 1){
+                holder.senderMessage.startAnimation(fadeInAnimation);
+            }
         }
     }
 

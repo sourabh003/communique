@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/blue_background"
+    android:background="@color/colorPrimary"
     tools:context=".Home">
 
     <com.google.android.material.appbar.MaterialToolbar
@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:layout_alignParentStart="true"
-        android:background="@color/primary"
+        android:background="@color/colorPrimaryDark"
         app:contentInsetEnd="10dp">
 
         <ImageView
@@ -28,6 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="center"
+            android:fontFamily="@font/sf"
             android:text="Communique"
             android:textColor="@color/white"
             android:textSize="18sp" />

@@ -3,9 +3,8 @@
     android:id="@+id/layout_parent"
     android:layout_width="match_parent"
     android:orientation="horizontal"
-    android:paddingTop="10dp"
-    android:paddingBottom="10dp"
-    android:background="@color/blue_background"
+    android:padding="10dp"
+    android:background="@color/colorPrimary"
     android:layout_height="wrap_content">
 
     <ImageView
@@ -21,6 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_weight="1"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/sf"
         android:layout_gravity="center"
         android:text="Name"
         android:textColor="@color/white"

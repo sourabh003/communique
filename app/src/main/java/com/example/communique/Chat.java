@@ -2,15 +2,23 @@ package com.example.communique;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.communique.adapters.ChatListAdapter;
 import com.example.communique.database.DBHelper;
@@ -32,11 +40,11 @@ import org.json.JSONObject;
 
 import java.util.TreeMap;
 
-public class Chat extends AppCompatActivity implements View.OnClickListener {
+public class Chat extends AppCompatActivity implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
 
     String TAG = "Chat";
 
-    ImageView userProfileImage;
+    ImageView userProfileImage, btnMenuOptions, btnBack;
     TextView userName;
     FloatingActionButton buttonSend;
     EditText textMessage;
@@ -66,8 +74,13 @@ public class Chat extends AppCompatActivity implements View.OnClickListener {
         buttonSend = findViewById(R.id.btnSendMessage);
         buttonSend.setOnClickListener(this);
         chatListView = findViewById(R.id.chatListView);
+        btnBack = findViewById(R.id.btn_back);
+        btnBack.setOnClickListener(this);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         chatListView.setLayoutManager(layoutManager);
+
+        btnMenuOptions = findViewById(R.id.btn_options);
+        btnMenuOptions.setOnClickListener(this);
 
         dbHelper = new DBHelper(this);
         userDetails = dbHelper.getCurrentUserDetails();
@@ -84,8 +97,21 @@ public class Chat extends AppCompatActivity implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.btnSendMessage) {
-            sendMessage(textMessage.getText().toString().trim());
+        switch (v.getId()) {
+            case R.id.btnSendMessage:
+                sendMessage(textMessage.getText().toString().trim());
+                break;
+
+            case R.id.btn_options:
+                PopupMenu menu = new PopupMenu(this, v);
+                menu.setOnMenuItemClickListener(this);
+                menu.inflate(R.menu.chat_menu);
+                menu.show();
+                break;
+
+            case R.id.btn_back:
+                onBackPressed();
+                break;
         }
     }
 
@@ -94,14 +120,14 @@ public class Chat extends AppCompatActivity implements View.OnClickListener {
         super.onStart();
 
         messageList.putAll(dbHelper.getMessages(recipientPhone));
-        refreshChatList();
+        refreshChatList(true);
 
         userChatNode.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 Message message = snapshot.getValue(Message.class);
                 messageList.put(message.getMessageTime(), message);
-                refreshChatList();
+                refreshChatList(false);
                 if (dbHelper.saveMessageToDatabase(message)) {
                     userChatNode.setValue(null);
                 }
@@ -129,8 +155,8 @@ public class Chat extends AppCompatActivity implements View.OnClickListener {
         });
     }
 
-    private void refreshChatList() {
-        adapter = new ChatListAdapter(messageList, userPhone, getApplicationContext());
+    private void refreshChatList(boolean startUp) {
+        adapter = new ChatListAdapter(messageList, userPhone, getApplicationContext(), startUp);
         chatListView.setAdapter(adapter);
         chatListView.scrollToPosition(messageList.size() - 1);
     }
@@ -150,12 +176,55 @@ public class Chat extends AppCompatActivity implements View.OnClickListener {
                 recipientPhone
         );
         messageList.put(message.getMessageTime(), message);
-        refreshChatList();
+        refreshChatList(false);
         textMessage.setText("");
         new Thread(() -> {
             dbHelper.saveMessageToDatabase(message);
             recipientChatNode.child(message.getMessageTime()).setValue(message);
         }).start();
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.chat_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.btn_clear_chat:
+                clearChats();
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private void clearChats() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater layoutInflater = this.getLayoutInflater();
+        View dialogView = layoutInflater.inflate(R.layout.dialog_clear_chat, null);
+        Button buttonCancel = dialogView.findViewById(R.id.btn_cancel);
+        Button buttonDelete = dialogView.findViewById(R.id.btn_delete);
+        builder.setView(dialogView);
+        AlertDialog dialog = builder.create();
+
+        buttonCancel.setOnClickListener((v) -> {
+            dialog.hide();
+        });
+
+        buttonDelete.setOnClickListener((v) -> {
+            Toast.makeText(this, "Messages Deleted", Toast.LENGTH_SHORT).show();
+            messageList.clear();
+            refreshChatList(false);
+            dialog.hide();
+            new Thread(() -> {
+                dbHelper.deleteChatsFromDatabase(recipientDetails);
+            }).start();
+        });
+        dialog.show();
 
     }
 }

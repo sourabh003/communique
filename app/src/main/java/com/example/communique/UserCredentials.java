@@ -1,9 +1,14 @@
 package com.example.communique;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -50,6 +55,7 @@ public class UserCredentials extends AppCompatActivity implements View.OnClickLi
         editTextPhone = findViewById(R.id.text_phone);
         editTextName = findViewById(R.id.text_name);
         textViewEmail = findViewById(R.id.text_email);
+        textViewEmail.setOnClickListener(this);
         imageViewProfileImage = findViewById(R.id.image_user);
         buttonSave = findViewById(R.id.button_save);
         buttonSave.setOnClickListener(this);
@@ -67,6 +73,21 @@ public class UserCredentials extends AppCompatActivity implements View.OnClickLi
         textViewEmail.setText(userDetails.getUserEmail());
         editTextName.setText(userDetails.getUserName());
         editTextPhone.setText(userDetails.getUserPhone());
+
+//        if (editTextPhone.getText().toString().isEmpty()) {
+//            TelephonyManager tMgr = (TelephonyManager) getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
+//            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_NUMBERS) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+//                // TODO: Consider calling
+//                //    ActivityCompat#requestPermissions
+//                // here to request the missing permissions, and then overriding
+//                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//                //                                          int[] grantResults)
+//                // to handle the case where the user grants the permission. See the documentation
+//                // for ActivityCompat#requestPermissions for more details.
+//                return;
+//            }
+//            String mPhoneNumber = tMgr.getLine1Number();
+//        }
     }
 
     @Override
@@ -80,6 +101,8 @@ public class UserCredentials extends AppCompatActivity implements View.OnClickLi
     public void onClick(View v) {
         if (v.getId() == R.id.button_save) {
             saveUserCredentials(editTextName.getText().toString().trim(), editTextPhone.getText().toString().trim());
+        } else {
+            Toast.makeText(this, "You cannot change your Email!", Toast.LENGTH_SHORT).show();
         }
     }
 

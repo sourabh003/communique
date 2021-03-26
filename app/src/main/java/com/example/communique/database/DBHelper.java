@@ -208,4 +208,9 @@ public class DBHelper extends SQLiteOpenHelper{
             return new ArrayList<>();
         }
     }
+
+    public void deleteChatsFromDatabase(Contact recipientDetails){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(DBConstants.MESSAGES_TABLE, DBConstants.MESSAGE_TO+"=? OR "+DBConstants.MESSAGE_FROM+"=?", new String[] {recipientDetails.getContactPhone(), recipientDetails.getContactPhone()});
+    }
 }

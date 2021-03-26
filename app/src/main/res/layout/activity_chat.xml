@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/blue_background"
+    android:background="@color/colorPrimary"
     tools:context=".Chat">
 
     <com.google.android.material.appbar.MaterialToolbar
@@ -12,8 +12,15 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:layout_alignParentStart="true"
-        android:background="@color/primary"
+        android:background="@color/colorPrimaryDark"
         app:contentInsetEnd="10dp">
+
+        <ImageView
+            android:id="@+id/btn_back"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_back_arrow" />
 
         <ImageView
             android:id="@+id/recipientImage"
@@ -22,15 +29,15 @@
             android:scaleType="fitCenter"
             android:src="@drawable/ic_account" />
 
-
         <TextView
             android:id="@+id/recipientName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="25dp"
             android:gravity="center"
-            android:text="Communique"
+            android:fontFamily="@font/sf"
+            android:text="Contact Name"
             android:textColor="@color/white"
             android:textSize="18sp" />
 
@@ -64,15 +71,19 @@
         android:id="@+id/actions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="10dp"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal">
 
         <EditText
             android:id="@+id/textMessage"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
+            android:fontFamily="@font/sf"
+            android:padding="10dp"
+            android:textSize="15sp"
+            android:background="@drawable/message_box_background"
             android:hint="Type a Message"
             android:textColor="@color/white"
             android:textColorHint="@color/gray" />
@@ -81,7 +92,7 @@
             android:id="@+id/btnSendMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_marginStart="10dp"
             android:src="@drawable/ic_baseline_send_24" />
 
 

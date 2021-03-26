@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/blue_background"
+    android:background="@color/colorPrimary"
     tools:context=".Home">
 
     <ImageView
@@ -27,6 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/white"
+            android:fontFamily="@font/sf"
             android:gravity="center"
             android:text="Welcome to"
             android:textSize="18sp"/>
@@ -36,6 +37,7 @@
             android:layout_height="wrap_content"
             android:textColor="@color/white"
             android:textStyle="bold"
+            android:fontFamily="@font/sf"
             android:gravity="center"
             android:text="Communique"
             android:textSize="24sp"/>
@@ -48,10 +50,14 @@
         android:layout_above="@+id/loading"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="20dp"
+        style="@style/Widget.MaterialComponents.Button"
+        android:backgroundTint="@color/white"
+        android:fontFamily="@font/sf"
         android:text="Continue with Google"
         android:padding="15dp"
+        android:drawableEnd="@drawable/googleg_standard_color_18"
         android:textAllCaps="false"
-        android:textColor="@color/white"
+        android:textColor="@color/gray"
         android:textSize="15sp" />
 
     <ProgressBar

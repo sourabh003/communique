@@ -8,8 +8,10 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="blue_background">#040B25</color>
-    <color name="primary">#36498F</color>
+    <color name="colorPrimaryDark">#212121</color>
+    <color name="colorPrimary">#303030</color>
+    <color name="colorAccent">#1976D2</color>
+    <color name="colorRecipientChat">#CC3333</color>
 
     <color name="yellow">#FFFF00</color>
     <color name="fuchsia">#FF00FF</color>
