@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.Editable;
@@ -21,6 +22,7 @@ import com.example.communique.database.DBHelper;
 import com.example.communique.helpers.Contact;
 import com.example.communique.utils.Constants;
 import com.example.communique.utils.Functions;
+import com.google.firebase.database.core.utilities.Tree;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,21 +32,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeMap;
 
 public class ContactsList extends AppCompatActivity implements View.OnClickListener {
 
     private static final int REQUEST_CODE = 101;
     RecyclerView contactsRecyclerView;
-    ArrayList<String> contactsList = new ArrayList<>();
     ContactListAdapter adapter;
     ImageView btnBack, btnSearch, btnCloseSearchBar;
     ProgressBar loading;
-    ArrayList<String> onlineList;
     DBHelper dbHelper;
     boolean searchBarOpen = false;
     EditText searchBar;
 
     HashMap<String, Contact> allContactsList = new HashMap<>();
+    TreeMap<String, Contact> contactTreeMap = new TreeMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,24 +73,16 @@ public class ContactsList extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String searchText = String.valueOf(s);
-                List<Contact> searchedList = new ArrayList<>();
-                if (!(searchText.isEmpty())) {
-                    for (String listItem : allContactsList.keySet()) {
-                        if (listItem.contains(searchText)) {
-                            searchedList.add(allContactsList.get(listItem));
+                TreeMap<String, Contact> searchedList = new TreeMap<>();
+                if (searchText.isEmpty()){
+                    adapter = new ContactListAdapter(new ArrayList<>(contactTreeMap.values()), getApplicationContext(), getParent());
+                } else {
+                    for(String contactName : contactTreeMap.keySet()){
+                        if (contactName.toLowerCase().contains(searchText.toLowerCase())){
+                            searchedList.put(contactName, contactTreeMap.get(contactName));
                         }
                     }
-                    try {
-                        adapter = new ContactListAdapter(searchedList, getApplicationContext());
-                    } catch (JSONException | IOException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    try {
-                        adapter = new ContactListAdapter(new ArrayList<>(allContactsList.values()), getApplicationContext());
-                    } catch (JSONException | IOException e) {
-                        e.printStackTrace();
-                    }
+                    adapter = new ContactListAdapter(new ArrayList<>(searchedList.values()), getApplicationContext(), getParent());
                 }
                 contactsRecyclerView.setAdapter(adapter);
             }
@@ -100,7 +94,6 @@ public class ContactsList extends AppCompatActivity implements View.OnClickListe
         });
 
         loading = findViewById(R.id.loading);
-
         dbHelper = new DBHelper(this);
     }
 
@@ -131,24 +124,21 @@ public class ContactsList extends AppCompatActivity implements View.OnClickListe
     private void getContacts() {
         if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
             // You can use the API that requires the permission.
-            try {
-                loadContactsInList(Functions.getContactsFomPhone(getApplicationContext()));
-            } catch (Exception e) {
-                Toast.makeText(this, "Exception => " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
+            loadContactsInList(Functions.getContactsFomPhone(getApplicationContext()));
+
         } else {
             // You can directly ask for the permission.
             requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, REQUEST_CODE);
         }
     }
 
-    private void loadContactsInList(List<Contact> contactList) throws JSONException, IOException {
+    private void loadContactsInList(List<Contact> contactList) {
         new Thread(() -> {
             for (Contact contact : contactList) {
-                allContactsList.put(contact.getContactName(), contact);
+                contactTreeMap.put(contact.getContactName(), contact);
             }
         }).start();
-        adapter = new ContactListAdapter(contactList, this);
+        adapter = new ContactListAdapter(contactList, this, this);
         contactsRecyclerView.setAdapter(adapter);
         Functions.showLoading(loading, false);
         contactsRecyclerView.setVisibility(View.VISIBLE);
@@ -201,8 +191,11 @@ public class ContactsList extends AppCompatActivity implements View.OnClickListe
             btnSearch.setVisibility(View.GONE);
             btnCloseSearchBar.setVisibility(View.VISIBLE);
             searchBar.setVisibility(View.VISIBLE);
+            searchBar.requestFocus();
+            Functions.openKeyboard(this);
+
         } else {
-            Functions.closeKeyboard(this);
+            Functions.closeKeyboard(this, this);
             searchBarOpen = false;
             btnSearch.setVisibility(View.VISIBLE);
             btnCloseSearchBar.setVisibility(View.GONE);

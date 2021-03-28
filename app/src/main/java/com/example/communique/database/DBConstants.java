@@ -7,6 +7,7 @@ public class DBConstants {
 
     public static final String USER_TABLE = "currentUserDetails";
     public static final String MESSAGES_TABLE = "messagesTable";
+    public static final String RECENT_MESSAGES_TABLE = "recentMessagesTable";
     public static final String CONTACTS_TABLE = "contactsTable";
 
     public static final String UID = "UID";
@@ -20,6 +21,7 @@ public class DBConstants {
     public static final String MESSAGE_FROM = "mfrom";
     public static final String MESSAGE_TIME = "mtime";
     public static final String MESSAGE_CONTENT = "mcontent";
+    public static final String MESSAGES_COUNT = "mcount";
 
 
     public static final String CONTACT_ID = "contactID";

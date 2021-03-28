@@ -69,6 +69,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/sf"
+            android:background="@drawable/chat_box_background"
             android:hint="Search Contact"
             android:layout_margin="5dp"
             android:visibility="gone"

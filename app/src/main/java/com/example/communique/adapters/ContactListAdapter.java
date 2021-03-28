@@ -38,11 +38,13 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
     List<Contact> contactList;
     Context context;
     ArrayList<String> onlineList;
+    Activity activity;
 
-    public ContactListAdapter(List<Contact> contactList, Context context) throws JSONException, IOException {
+    public ContactListAdapter(List<Contact> contactList, Context context, Activity activity) {
         this.contactList = contactList;
         this.context = context;
-        this.onlineList = Functions.stringToArray(Functions.readFile(Constants.ONLINE_USERS_FILE, context));
+        this.activity = activity;
+//        this.onlineList = Functions.stringToArray(Functions.readFile(Constants.ONLINE_USERS_FILE, context));
     }
 
     @NonNull
@@ -66,10 +68,12 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
 //                holder.inviteButton.setVisibility(View.VISIBLE);
 //            }
         holder.linearLayout.setOnClickListener(v -> {
+//            Functions.closeKeyboard(activity, context);
             Intent intent = new Intent(context, Chat.class);
             intent.putExtra(Constants.RECIPIENT_ID, contactInfo.getContactID());
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
-            ((Activity) context).finish();
+            ((Activity)context).finish();
         });
     }
 

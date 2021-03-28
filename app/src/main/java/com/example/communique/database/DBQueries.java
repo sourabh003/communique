@@ -11,6 +11,7 @@ public class DBQueries extends DBConstants{
     public static final String GET_RECIPIENT_MESSAGES = "SELECT * FROM " + MESSAGES_TABLE + " WHERE " + MESSAGE_TO + " = ? OR " + MESSAGE_FROM + " = ?" ;
     public static final String GET_RECENT_CHATS = "SELECT " + MESSAGE_FROM + ", " + MESSAGE_TO + " FROM " + MESSAGES_TABLE;
     public static final String DELETE_MESSAGES_FROM_LOCAL_DATABASE = "DELETE FROM " + MESSAGES_TABLE + " WHERE " + MESSAGE_TO + " = ? OR " + MESSAGE_FROM + " = ?" ;
+    public static final String CREATE_RECENT_MESSAGES_TABLE = "CREATE TABLE " + RECENT_MESSAGES_TABLE + " (" + MESSAGE_FROM + " TEXT NOT NULL, " + MESSAGES_COUNT + " TEXT)";
 
     //Contacts related Queries
     public static final String CREATE_CONTACTS_TABLE = "CREATE TABLE "+CONTACTS_TABLE+" ("+CONTACT_ID+" TEXT NOT NULL, "+CONTACT_NAME+" TEXT, "+CONTACT_EMAIL+" TEXT, "+CONTACT_IMAGE+" TEXT, "+CONTACT_PHONE+" TEXT)";

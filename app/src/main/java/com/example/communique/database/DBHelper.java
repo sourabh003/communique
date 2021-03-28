@@ -11,8 +11,10 @@ import com.example.communique.helpers.Contact;
 import com.example.communique.helpers.Message;
 import com.example.communique.helpers.User;
 import com.example.communique.utils.Constants;
+import com.example.communique.utils.FirebaseUtils;
 import com.example.communique.utils.Functions;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,6 +39,7 @@ public class DBHelper extends SQLiteOpenHelper{
         db.execSQL(DBQueries.CREATE_USER_TABLE);
         db.execSQL(DBQueries.CREATE_MESSAGES_TABLE);
         db.execSQL(DBQueries.CREATE_CONTACTS_TABLE);
+        db.execSQL(DBQueries.CREATE_RECENT_MESSAGES_TABLE);
     }
 
     @Override
@@ -44,6 +47,7 @@ public class DBHelper extends SQLiteOpenHelper{
         db.execSQL("DROP TABLE IF EXISTS " + DBConstants.USER_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + DBConstants.MESSAGES_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + DBConstants.CONTACTS_TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + DBConstants.RECENT_MESSAGES_TABLE);
         onCreate(db);
     }
 
@@ -188,6 +192,20 @@ public class DBHelper extends SQLiteOpenHelper{
         return true;
     }
 
+    public List<String> getContactNumbers(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor contacts = db.rawQuery(DBQueries.GET_CONTACTS, null);
+        if(contacts.getCount() != 0){
+            List<String> contactsList = new ArrayList<>();
+            while (contacts.moveToNext()){
+                contactsList.add(contacts.getString(4));
+            }
+            return contactsList;
+        } else {
+            return new ArrayList<>();
+        }
+    }
+
     public List<Contact> getContacts(){
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor contacts = db.rawQuery(DBQueries.GET_CONTACTS, null);
@@ -213,4 +231,15 @@ public class DBHelper extends SQLiteOpenHelper{
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(DBConstants.MESSAGES_TABLE, DBConstants.MESSAGE_TO+"=? OR "+DBConstants.MESSAGE_FROM+"=?", new String[] {recipientDetails.getContactPhone(), recipientDetails.getContactPhone()});
     }
+
+//    public boolean insertRecentMessages(User user, DataSnapshot snapshot){
+//        List<String> contactNumbers = getContactNumbers();
+//        for (DataSnapshot child : snapshot.getChildren()) {
+//            if(contactNumbers.contains(child.getKey())){
+//                if(child.hasChild(FirebaseUtils.FIREBASE_CHAT_NODE)){
+//
+//                }
+//            }
+//        }
+//    }
 }

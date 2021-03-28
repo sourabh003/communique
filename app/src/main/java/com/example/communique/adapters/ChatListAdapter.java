@@ -55,6 +55,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ViewHo
                 if(!startUp){
                     holder.recipientMessage.startAnimation(fadeInAnimation);
                     mp.start();
+                    mp.release();
                 }
             }
         } else {
@@ -64,6 +65,16 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ViewHo
                 holder.senderMessage.startAnimation(fadeInAnimation);
             }
         }
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
     @Override

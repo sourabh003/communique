@@ -33,6 +33,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class Home extends AppCompatActivity implements View.OnClickListener {
@@ -75,8 +76,37 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
     protected void onStart() {
         super.onStart();
         userDetails = dbHelper.getCurrentUserDetails();
+
+        HashMap<String, String> recentChatsMap = new HashMap<>();
+        List<String> recentChatsList =  dbHelper.getRecentChats(userDetails.getUserPhone());
+        databaseReference.child(FirebaseUtils.FIREBASE_RECENT_MESSAGES_NODE).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                 if (snapshot.hasChild(userDetails.getUserPhone())){
+                     for(DataSnapshot snapshot1 : snapshot.child(userDetails.getUserPhone()).getChildren()){
+                         if(recentChatsList.contains(snapshot1.getKey())){
+                             recentChatsMap.put(snapshot1.getKey(), String.valueOf(snapshot1.getChildrenCount()));
+                         } else {
+                             recentChatsList.add(snapshot1.getKey());
+                             recentChatsMap.put(snapshot1.getKey(), String.valueOf(snapshot1.getChildrenCount()));
+                         }
+                     }
+                     try {
+                         refreshList(recentChatsList, recentChatsMap);
+                     } catch (IOException e) {
+                         e.printStackTrace();
+                     }
+                 }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e(TAG, "Error in Home Activity : " + error);
+            }
+        });
+
         try {
-            refreshList(dbHelper.getRecentChats(userDetails.getUserPhone()));
+            refreshList(recentChatsList, null);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -92,8 +122,8 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
         Picasso.get().load(image).transform(new CircleTransform()).into(btnUser);
     }
 
-    private void refreshList(List<String> recentChatsList) throws IOException {
-        adapter = new RecentChatsAdapter(recentChatsList, this);
+    private void refreshList(List<String> recentChatsList, HashMap<String, String> recentChatsMap) throws IOException {
+        adapter = new RecentChatsAdapter(recentChatsList, recentChatsMap, this);
         recentChatsRecyclerView.setAdapter(adapter);
     }
 

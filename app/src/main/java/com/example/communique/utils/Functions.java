@@ -2,6 +2,7 @@ package com.example.communique.utils;
 
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.database.Cursor;
@@ -58,7 +59,7 @@ public class Functions {
         return cursor.getCount();
     }
 
-    public static List<Contact> getContactsFomPhone(Context context) throws JSONException {
+    public static List<Contact> getContactsFomPhone(Context context) {
         String contactId, contactName = null, contactNumber = null;
         List<Contact> contactList = new ArrayList<>();
         DBHelper dbHelper = new DBHelper(context);
@@ -114,9 +115,23 @@ public class Functions {
         return contactList;
     }
 
-    public static void closeKeyboard(Activity activity) {
-        InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+    public static void openKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager =
+                (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.toggleSoftInputFromWindow(
+                activity.getCurrentFocus().getApplicationWindowToken(),
+                InputMethodManager.SHOW_FORCED, 0);
+    }
+
+    public static boolean isKeyboardOpen(Activity activity){
+        return ((InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE)).isAcceptingText();
+    }
+
+    public static void closeKeyboard(Activity activity, Context context) {
+        InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        if(inputMethodManager.isAcceptingText()){
+            inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+        }
     }
 
     public static boolean writeFile(String data, String filename, Context context) throws IOException {

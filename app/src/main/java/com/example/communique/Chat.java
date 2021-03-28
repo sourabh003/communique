@@ -58,6 +58,7 @@ public class Chat extends AppCompatActivity implements View.OnClickListener, Pop
     DatabaseReference usersNode = FirebaseDatabase.getInstance().getReference().child(FirebaseUtils.FIREBASE_USER_NODE);
     DatabaseReference userChatNode;
     DatabaseReference recipientChatNode;
+    DatabaseReference recentMessagesNode = FirebaseDatabase.getInstance().getReference().child(FirebaseUtils.FIREBASE_RECENT_MESSAGES_NODE);
 
     RecyclerView chatListView;
     ChatListAdapter adapter;
@@ -78,6 +79,8 @@ public class Chat extends AppCompatActivity implements View.OnClickListener, Pop
         btnBack.setOnClickListener(this);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         chatListView.setLayoutManager(layoutManager);
+        chatListView.setHasFixedSize(true);
+        chatListView.setItemViewCacheSize(10);
 
         btnMenuOptions = findViewById(R.id.btn_options);
         btnMenuOptions.setOnClickListener(this);
@@ -91,7 +94,6 @@ public class Chat extends AppCompatActivity implements View.OnClickListener, Pop
         recipientPhone = recipientDetails.getContactPhone();
         userName.setText(recipientDetails.getContactName());
         recipientChatNode = usersNode.child(recipientPhone).child(FirebaseUtils.FIREBASE_CHAT_NODE);
-
 
     }
 
@@ -119,41 +121,47 @@ public class Chat extends AppCompatActivity implements View.OnClickListener, Pop
     protected void onStart() {
         super.onStart();
 
+//        textMessage.requestFocus();
+//        Functions.openKeyboard(this);
+
         messageList.putAll(dbHelper.getMessages(recipientPhone));
         refreshChatList(true);
 
-        userChatNode.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                Message message = snapshot.getValue(Message.class);
-                messageList.put(message.getMessageTime(), message);
-                refreshChatList(false);
-                if (dbHelper.saveMessageToDatabase(message)) {
-                    userChatNode.setValue(null);
-                }
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+        userChatNode.addChildEventListener(childEventListener);
     }
+
+    ChildEventListener childEventListener = new ChildEventListener() {
+        @Override
+        public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            Message message = snapshot.getValue(Message.class);
+            messageList.put(message.getMessageTime(), message);
+            refreshChatList(false);
+            if (dbHelper.saveMessageToDatabase(message)) {
+                userChatNode.child(message.getMessageTime()).setValue(null);
+                recentMessagesNode.child(userPhone).child(message.getMessageFrom()).setValue(null);
+            }
+        }
+
+        @Override
+        public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+        }
+
+        @Override
+        public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+        }
+
+        @Override
+        public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError error) {
+
+        }
+    };
 
     private void refreshChatList(boolean startUp) {
         adapter = new ChatListAdapter(messageList, userPhone, getApplicationContext(), startUp);
@@ -165,6 +173,12 @@ public class Chat extends AppCompatActivity implements View.OnClickListener, Pop
         if (!(message.isEmpty())) {
             saveMessageInDataabses(message);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        userChatNode.removeEventListener(childEventListener);
+        finish();
     }
 
     private void saveMessageInDataabses(String messageContent) {
@@ -181,6 +195,7 @@ public class Chat extends AppCompatActivity implements View.OnClickListener, Pop
         new Thread(() -> {
             dbHelper.saveMessageToDatabase(message);
             recipientChatNode.child(message.getMessageTime()).setValue(message);
+            recentMessagesNode.child(message.getMessageTo()).child(message.getMessageFrom()).child(message.getMessageID()).setValue(message);
         }).start();
 
     }
