@@ -37,6 +37,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
     RecyclerView recentChatListView;
     ImageView btnProfile, btnOptions;
     FloatingActionButton btnOpenContactList;
+    AlertDialog permissionDialog;
 
     Database database;
     User user;
@@ -60,12 +61,9 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
         btnOptions.setOnClickListener(this);
         recentChatListView = findViewById(R.id.layout_recent_chat_list);
         recentChatListView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new RecentChatListAdapter(recentMessagesList, newMessagesList, this);
+        recentChatListView.setAdapter(adapter);
 
-        if(!(user.getUserPhone().isEmpty())){
-            recentMessagesList.addAll(database.getRecentChats(user.getUserPhone()));
-            adapter = new RecentChatListAdapter(recentMessagesList, newMessagesList, this);
-            recentChatListView.setAdapter(adapter);
-        }
     }
 
     @Override
@@ -76,7 +74,9 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
             Picasso.get().load(user.getUserImage()).transform(new CircleTransform()).into(btnProfile);
         }
 
-
+        recentMessagesList.clear();
+        recentMessagesList.addAll(database.getRecentChats(user.getUserPhone()));
+        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -102,8 +102,8 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
             final AlertDialog dialogPermission = new AlertDialog.Builder(this).create();
             dialogPermission.setView(view);
             btnContinue.setOnClickListener(v -> {
-                dialogPermission.hide();
-                new Handler().postDelayed(() -> {requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, Constants.READ_CONTACTS_PERMISSION_CODE);}, 500);
+                permissionDialog = dialogPermission;
+                requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, Constants.READ_CONTACTS_PERMISSION_CODE);
             });
             dialogPermission.show();
         } else {
@@ -116,6 +116,9 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
         switch (requestCode) {
             case Constants.READ_CONTACTS_PERMISSION_CODE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if(permissionDialog.isShowing()){
+                        permissionDialog.hide();
+                    }
                     startActivity(new Intent(this, ContactList.class));
                 } else {
                     Toast.makeText(this, "We cannot import Contacts without this permission", Toast.LENGTH_SHORT).show();

@@ -3,4 +3,5 @@
     <string name="contact_permisson_description">We need to Access your contacts in order to link \nthem with Communique</string>
     <string name="contact_permission_title">Contacts Permisssion Required</string>
     <string name="contact_permission_description">To keep you connected with your contacts, we need this permission</string>
+    <string name="description_delete_messages">Clearing chat will remove them permanently. Are you Sure ?</string>
 </resources>

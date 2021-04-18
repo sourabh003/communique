@@ -64,22 +64,27 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     private void signUp(String name, String email, String phone) {
         Functions.showLoading(loading, true);
         if(!(name.isEmpty()) && !(phone.isEmpty())){
-            phone = Constants.COUNTRY_CODE_INDIA + phone;
-            User user = new User(
-                    Functions.getUniqueID(),
-                    name,
-                    email,
-                    "",
-                    phone
-            );
-            new Thread(() -> {
-                database.saveUserDetails(null, user);
-                firebaseUsersNode.child(user.getUserPhone()).child(FirebaseUtils.USER_DETAILS_NODE).setValue(user);
-            }).start();
-            //To be replaced with ProfileSetup Activity
+            if(phone.length() == 10){
+                phone = Constants.COUNTRY_CODE_INDIA + phone;
+                User user = new User(
+                        Functions.getUniqueID(),
+                        name,
+                        email,
+                        "",
+                        phone
+                );
+                new Thread(() -> {
+                    database.saveUserDetails(null, user);
+                    firebaseUsersNode.child(user.getUserPhone()).child(FirebaseUtils.USER_DETAILS_NODE).setValue(user);
+                }).start();
+                //To be replaced with ProfileSetup Activity
 //            startActivity(new Intent(this, ProfileSetup.class));
-            startActivity(new Intent(this, Home.class));
-            finish();
+                startActivity(new Intent(this, Home.class));
+                finish();
+            } else {
+                Toast.makeText(this, "Invalid Phone Number!", Toast.LENGTH_SHORT).show();
+                Functions.showLoading(loading, false);
+            }
         } else {
             Toast.makeText(this, "Fields Empty!", Toast.LENGTH_SHORT).show();
             Functions.showLoading(loading, false);

@@ -56,6 +56,8 @@ public class ContactList extends AppCompatActivity implements View.OnClickListen
         searchBar = findViewById(R.id.search_bar);
 
         database = new Database(this);
+        contactListAdapter = new ContactListAdapter(contactsArray, this);
+        contactListView.setAdapter(contactListAdapter);
     }
 
     @Override
@@ -102,8 +104,7 @@ public class ContactList extends AppCompatActivity implements View.OnClickListen
             getContactsFromPhone();
         }
         Functions.showLoading(loading, false);
-        contactListAdapter = new ContactListAdapter(contactsArray, this);
-        contactListView.setAdapter(contactListAdapter);
+        contactListAdapter.notifyDataSetChanged();
 
     }
 

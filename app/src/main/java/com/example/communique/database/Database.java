@@ -244,4 +244,9 @@ public class Database extends SQLiteOpenHelper {
             return contactsList;
         }
     }
+
+    public void deleteChatMessages(String recipientPhone){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(DatabaseConfigs.MESSAGES_TABLE, DatabaseConfigs.MESSAGE_TO+"=? OR "+DatabaseConfigs.MESSAGE_FROM+"=?", new String[] {recipientPhone, recipientPhone});
+    }
 }

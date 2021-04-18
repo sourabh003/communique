@@ -1,13 +1,18 @@
 package com.example.communique.views;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,7 +29,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-public class Chat extends AppCompatActivity implements View.OnClickListener {
+public class Chat extends AppCompatActivity implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
 
     ImageView btnBack, btnUserImage, btnOptions;
     TextView layoutRecipientName;
@@ -49,8 +54,11 @@ public class Chat extends AppCompatActivity implements View.OnClickListener {
         user = database.getUserDetails();
 
         btnBack = findViewById(R.id.btn_back);
+        btnBack.setOnClickListener(this);
         btnUserImage = findViewById(R.id.btn_user_image);
         btnOptions = findViewById(R.id.btn_options);
+        btnOptions.setOnClickListener(this);
+
         layoutRecipientName = findViewById(R.id.text_recipient_name);
         layoutRecipientName.setText(Functions.decryptName(recipient.getUserName()));
         layoutMessageBox = findViewById(R.id.layout_message_box);
@@ -58,6 +66,8 @@ public class Chat extends AppCompatActivity implements View.OnClickListener {
         btnSendMessage.setOnClickListener(this);
         layoutChatListView = findViewById(R.id.layout_chat_list_view);
         layoutChatListView.setLayoutManager(new LinearLayoutManager(this));
+        chatListAdapter = new ChatListAdapter(messageList, messageArray, user.getUserPhone());
+        layoutChatListView.setAdapter(chatListAdapter);
 
     }
 
@@ -65,10 +75,11 @@ public class Chat extends AppCompatActivity implements View.OnClickListener {
     protected void onStart() {
         super.onStart();
 
-        messageList.putAll(database.getMessagesFromDatabase(recipient.getUserPhone()));
-        messageArray.addAll(messageList.keySet());
-        chatListAdapter = new ChatListAdapter(messageList, messageArray, user.getUserPhone());
-        layoutChatListView.setAdapter(chatListAdapter);
+        if(messageArray.size() != database.getMessagesFromDatabase(recipient.getUserPhone()).size()){
+            messageList.putAll(database.getMessagesFromDatabase(recipient.getUserPhone()));
+            messageArray.addAll(messageList.keySet());
+            chatListAdapter.notifyDataSetChanged();
+        }
     }
 
     @Override
@@ -76,6 +87,13 @@ public class Chat extends AppCompatActivity implements View.OnClickListener {
         int id = v.getId();
         if(id == R.id.btn_send){
             sendMessage(layoutMessageBox.getText().toString().trim());
+        } else if(id == R.id.btn_back){
+            onBackPressed();
+        } else if(id == R.id.btn_options){
+            PopupMenu menu = new PopupMenu(this, v);
+            menu.setOnMenuItemClickListener(this);
+            menu.inflate(R.menu.chat_menu);
+            menu.show();
         }
     }
 
@@ -99,4 +117,41 @@ public class Chat extends AppCompatActivity implements View.OnClickListener {
     }
 
 
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.btn_clear_chat:
+                openConfirmationDialog();
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private void openConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater layoutInflater = this.getLayoutInflater();
+        View dialogView = layoutInflater.inflate(R.layout.layout_confirmation_dialog, null);
+        Button buttonCancel = dialogView.findViewById(R.id.btn_negative);
+        Button buttonDelete = dialogView.findViewById(R.id.btn_positive);
+        buttonDelete.setText("Delete");
+        TextView dialogDescription = dialogView.findViewById(R.id.layout_dialog_description);
+        dialogDescription.setText(R.string.description_delete_messages);
+        builder.setView(dialogView);
+        AlertDialog dialog = builder.create();
+        buttonCancel.setOnClickListener((v) -> {
+            dialog.hide();
+        });
+        buttonDelete.setOnClickListener((v) -> {
+            Toast.makeText(this, "Messages Deleted", Toast.LENGTH_SHORT).show();
+            messageList.clear();
+            messageArray.clear();
+            chatListAdapter.notifyDataSetChanged();
+            dialog.hide();
+            new Thread(() -> {
+                database.deleteChatMessages(recipient.getUserPhone());
+            }).start();
+        });
+        dialog.show();
+    }
 }
