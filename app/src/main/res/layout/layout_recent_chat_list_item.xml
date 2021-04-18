@@ -1,48 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/layout_parent"
+    android:id="@+id/layout_parent_view"
     android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="10dp"
-    android:background="@color/colorPrimary"
-    android:layout_height="wrap_content">
+    android:padding="15dp">
 
     <ImageView
-        android:id="@+id/layout_image"
+        android:id="@+id/image_profile"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_gravity="center"
-        android:layout_margin="10dp"
+        android:layout_gravity="center_vertical"
         android:src="@drawable/ic_account" />
 
     <TextView
-        android:id="@+id/layout_name"
-        android:layout_width="wrap_content"
-        android:layout_weight="1"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/sf"
+        android:id="@+id/text_name"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
+        android:layout_marginStart="10dp"
+        android:fontFamily="@font/sf"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
         android:text="Name"
-        android:textColor="@color/white"
-        android:textSize="20sp" />
+        android:textColor="@color/gray" />
 
     <TextView
-        android:id="@+id/newMessagesCounter"
+        android:id="@+id/text_counter"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:text="0"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_margin="10dp"
         android:visibility="gone"
-        android:textAlignment="center"
+        android:paddingStart="8dp"
         android:fontFamily="@font/sf"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:background="@drawable/new_messages_counter"
-        android:gravity="center"
-        android:textSize="15sp"
+        android:paddingEnd="8dp"
+        android:background="@drawable/background_circle_counter"
         android:padding="5dp"
-        android:textStyle="bold"
-        android:textColor="@color/white"/>
+        android:layout_marginStart="10dp"
+        android:gravity="center_vertical"
+        android:text="0"
+        android:textColor="@color/white" />
 
 </LinearLayout>

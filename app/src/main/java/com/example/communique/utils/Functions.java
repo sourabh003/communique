@@ -1,40 +1,34 @@
 package com.example.communique.utils;
 
 import android.app.Activity;
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.database.Cursor;
 import android.provider.ContactsContract;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.example.communique.database.DBHelper;
-import com.example.communique.helpers.Contact;
+import com.example.communique.database.Database;
 import com.example.communique.helpers.User;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Random;
+import java.util.TreeMap;
 
 public class Functions {
+
+    static String TAG = "Functions";
+
     public static void showLoading(ProgressBar loading, boolean condition) {
         if (condition) {
             loading.setVisibility(View.VISIBLE);
@@ -55,19 +49,22 @@ public class Functions {
     }
 
     public static int getContactsCount(Context context) {
+        int count;
         Cursor cursor = context.getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
-        return cursor.getCount();
+        count = cursor.getCount();
+        cursor.close();
+        return count;
     }
 
-    public static List<Contact> getContactsFomPhone(Context context) {
-        String contactId, contactName = null, contactNumber = null;
-        List<Contact> contactList = new ArrayList<>();
-        DBHelper dbHelper = new DBHelper(context);
-        User myDetails = dbHelper.getCurrentUserDetails();
+    public static ArrayList<String> fetchContactsFromPhone(Context context) {
+        String contactId, contactName, contactNumber;
+        ArrayList<User> contactsDetailsList = new ArrayList<>();
+        ArrayList<String> contactsNameList = new ArrayList<>();
+        Database dbHelper = new Database(context);
+        User myDetails = dbHelper.getUserDetails();
         Cursor cursor = context.getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
         if (cursor.getCount() > 0) {
             while (cursor.moveToNext()) {
-                JSONObject contact = new JSONObject();
                 int hasPhoneNumber = Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)));
                 if (hasPhoneNumber > 0) {
 
@@ -93,7 +90,8 @@ public class Functions {
                         if (!(contactNumber.contains("+91"))) {
                             contactNumber = "+91" + contactNumber;
                         }
-                        Contact newContact = new Contact(
+                        contactName = encryptName(contactName, contactId);
+                        User newContact = new User(
                                 contactId,
                                 contactName,
                                 "",
@@ -101,18 +99,35 @@ public class Functions {
                                 contactNumber
                         );
                         if (!(contactNumber.equals(myDetails.getUserPhone()))) {
-                            contactList.add(newContact);
+                            contactsDetailsList.add(newContact);
+                            contactsNameList.add(contactName);
                         }
                     }
                     phoneCursor.close();
                 }
             }
-            new Thread(() -> {
-                dbHelper.addContactsToDatabase(contactList);
-            }).start();
         }
         cursor.close();
-        return contactList;
+        new Thread(() -> {
+            dbHelper.saveMultipleContactsToDatabase(contactsDetailsList);
+            Functions.deleteFileFromInternalStorage(Constants.CONTACTS_CACHE_FILE, context);
+            try {
+                Functions.saveToInternalStorage(contactsNameList.toString(), Constants.CONTACTS_CACHE_FILE, context);
+            } catch (IOException e) {
+                Log.e(TAG, "fetchContactsFromPhone: Error saving cache file => " + e);
+                e.printStackTrace();
+            }
+        }).start();
+        Collections.sort(contactsNameList);
+        return contactsNameList;
+    }
+
+    public static String encryptName(String name, String id) {
+        return name + Constants.KEY_VALUE_SEPERATOR + id;
+    }
+
+    public static String decryptName(String name) {
+        return name.split(Constants.KEY_VALUE_SEPERATOR)[0];
     }
 
     public static void openKeyboard(Activity activity) {
@@ -134,7 +149,7 @@ public class Functions {
         }
     }
 
-    public static boolean writeFile(String data, String filename, Context context) throws IOException {
+    public static boolean saveToInternalStorage(String data, String filename, Context context) throws IOException {
         FileOutputStream fos = context.openFileOutput(filename, Context.MODE_PRIVATE);
         //default mode is PRIVATE, can be APPEND etc.
         fos.write(data.getBytes());
@@ -142,7 +157,7 @@ public class Functions {
         return true;
     }
 
-    public static String readFile(String filename, Context context) throws IOException {
+    public static String readFileFromInternalStorage(String filename, Context context) throws IOException {
         FileInputStream fis = context.openFileInput(filename);
         InputStreamReader isr = new InputStreamReader(fis);
         BufferedReader bufferedReader = new BufferedReader(isr);
@@ -155,14 +170,14 @@ public class Functions {
         return sb.toString();
     }
 
-    public static boolean checkFile(String filename, Context context) {
+    public static boolean checkFileInInternalStorage(String filename, Context context) {
         File dir = context.getFilesDir();
         File file = new File(dir, filename);
         return file.exists();
     }
 
-    public static boolean deleteFile(String filename, Context context) {
-        if (checkFile(filename, context)) {
+    public static boolean deleteFileFromInternalStorage(String filename, Context context) {
+        if (checkFileInInternalStorage(filename, context)) {
             File dir = context.getFilesDir();
             File file = new File(dir, filename);
             return file.delete();
@@ -170,16 +185,23 @@ public class Functions {
         return false;
     }
 
-    public static ArrayList<String> stringToArray() {
-        String arr = "[1,2]";
-        String[] items = arr.replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\\s", "").split(",");
-        return new ArrayList<>(Arrays.asList(items));
+    public static TreeMap<String, String> stringToMap(Context context, String mapData) {
+        TreeMap<String, String> treeMap = new TreeMap<>();
+        mapData = mapData.substring(1, mapData.length() - 1);
+        String[] array = mapData.split(",");
+        for(String item : array){
+            treeMap.put(item.split("=")[0].trim(), item.split("=")[1].trim());
+        }
+        return treeMap;
     }
 
-    public static ArrayList<String> stringToArray(String input) {
-        ArrayList<String> arrayList = new ArrayList<>();
-        String[] items = input.replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\\s", "").split(",");
-        arrayList.addAll(Arrays.asList(items));
-        return arrayList;
+    public static ArrayList<String> stringToArray(String contactsString) {
+        ArrayList<String> tempArray = new ArrayList<>();
+        contactsString = contactsString.substring(1, contactsString.length() - 1);
+        String[] array = contactsString.split(",");
+        for(String item : array){
+            tempArray.add(item.trim());
+        }
+        return tempArray;
     }
 }

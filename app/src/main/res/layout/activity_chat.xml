@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
-    tools:context=".Chat">
+    tools:context=".views.Chat">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
@@ -23,21 +22,23 @@
             android:src="@drawable/ic_back_arrow" />
 
         <ImageView
-            android:id="@+id/recipientImage"
+            android:id="@+id/btn_user_image"
             android:layout_width="30dp"
             android:layout_height="30dp"
+            android:layout_marginStart="20dp"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_account" />
 
+
         <TextView
-            android:id="@+id/recipientName"
+            android:id="@+id/text_recipient_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
-            android:layout_marginStart="25dp"
-            android:gravity="center"
+            android:layout_marginStart="10dp"
             android:fontFamily="@font/sf"
-            android:text="Contact Name"
+            android:gravity="center_vertical"
+            android:text="Recipient Name"
             android:textColor="@color/white"
             android:textSize="18sp" />
 
@@ -51,50 +52,44 @@
     </com.google.android.material.appbar.MaterialToolbar>
 
     <RelativeLayout
-        android:id="@+id/view"
+        android:id="@+id/layout_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/actions"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/layout_actions"
         android:layout_below="@id/toolbar"
         android:orientation="vertical">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/chatListView"
+            android:id="@+id/layout_chat_list_view"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:padding="10dp"
-            android:layout_height="wrap_content" />
+            android:padding="10dp" />
 
     </RelativeLayout>
 
     <LinearLayout
-        android:id="@+id/actions"
+        android:id="@+id/layout_actions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp"
         android:layout_alignParentBottom="true"
-        android:orientation="horizontal">
+        android:padding="5dp">
 
         <EditText
-            android:id="@+id/textMessage"
+            android:id="@+id/layout_message_box"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:fontFamily="@font/sf"
-            android:padding="10dp"
-            android:textSize="15sp"
-            android:background="@drawable/message_box_background"
-            android:hint="Type a Message"
-            android:textColor="@color/white"
-            android:textColorHint="@color/gray" />
+            android:hint="Type a Message" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/btnSendMessage"
+            android:id="@+id/btn_send"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="5dp"
+            android:backgroundTint="@color/colorAccent"
             android:src="@drawable/ic_baseline_send_24" />
-
 
     </LinearLayout>
 

@@ -8,10 +8,11 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="colorPrimaryDark">#212121</color>
-    <color name="colorPrimary">#303030</color>
-    <color name="colorAccent">#1976D2</color>
+    <color name="colorPrimaryDark">#003C6B</color>
+    <color name="colorPrimary">#008ED6</color>
+    <color name="colorAccent">#F79303</color>
     <color name="colorRecipientChat">#CC3333</color>
+    <color name="customInputBox">#e2e2e2</color>
 
     <color name="yellow">#FFFF00</color>
     <color name="fuchsia">#FF00FF</color>

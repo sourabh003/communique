@@ -11,6 +11,8 @@ public class Contact {
         this.contactPhone = contactPhone;
     }
 
+    public Contact(){}
+
     public String getContactID() {
         return contactID;
     }

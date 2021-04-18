@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Communique</string>
+    <string name="contact_permisson_description">We need to Access your contacts in order to link \nthem with Communique</string>
+    <string name="contact_permission_title">Contacts Permisssion Required</string>
+    <string name="contact_permission_description">To keep you connected with your contacts, we need this permission</string>
 </resources>

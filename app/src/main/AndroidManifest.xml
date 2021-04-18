@@ -4,28 +4,30 @@
 
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_logo"
+        android:icon="@mipmap/ic_new_logo"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_logo_round"
+        android:roundIcon="@mipmap/ic_new_logo_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Communique">
-        <activity android:name=".Chat"></activity>
-        <activity android:name=".ContactsList" />
-        <activity android:name=".UserCredentials" />
-        <activity android:name=".UserProfile" />
-        <activity android:name=".Welcome" />
-        <activity android:name=".Home" />
-        <activity android:name=".Splash">
+        <activity android:name=".views.Chat"></activity>
+        <activity android:name=".views.ContactList" />
+        <activity android:name=".views.Home" />
+        <activity android:name=".views.ProfileSetup" />
+        <activity android:name=".views.Login" />
+        <activity android:name=".views.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".views.Test" />
+        <activity android:name=".views.Permissions" />
+        <activity android:name=".views.UserProfile" />
     </application>
 
 </manifest>

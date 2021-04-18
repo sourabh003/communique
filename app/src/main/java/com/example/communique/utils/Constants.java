@@ -1,6 +1,9 @@
 package com.example.communique.utils;
 
 public class Constants {
+    public static final int READ_CONTACTS_PERMISSION_CODE = 100;
+    public static final String KEY_VALUE_SEPERATOR = "-----";
+
     public static final String CURRENT_USER_FILE = "current-user.txt";
 
     public static final String USER_ID = "id";
@@ -15,7 +18,7 @@ public class Constants {
 
     public static final String ONLINE_USERS_FILE = "onlineusersfile.txt";
     public static final String COUNTRY_CODE_INDIA = "+91";
-    public static final String ALL_CONTACTS_FILE = "allContactsBackup.txt";
+    public static final String CONTACTS_CACHE_FILE = "contacts_cache.txt";
 
     public static final String MESSAGE_ID = "mid";
     public static final String MESSAGE_TO = "mto";

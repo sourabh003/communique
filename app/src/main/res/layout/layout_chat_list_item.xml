@@ -2,35 +2,32 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="10dp">
 
     <TextView
-        android:id="@+id/recipientMessage"
+        android:id="@+id/layout_incoming_message_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:background="@drawable/chat_box_background"
-        android:backgroundTint="@color/colorRecipientChat"
+        android:background="@drawable/incoming_message_box"
         android:fontFamily="@font/sf"
         android:padding="10dp"
+        android:visibility="gone"
+        android:paddingStart="30dp"
         android:text="Message"
-        android:textColor="@color/white"
-        android:textSize="15sp"
-        android:visibility="gone" />
+        android:textColor="@color/white" />
 
     <TextView
-        android:id="@+id/senderMessage"
+        android:id="@+id/layout_outgoing_message_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:layout_margin="5dp"
-        android:background="@drawable/chat_box_background"
-        android:backgroundTint="@color/DodgerBlue"
+        android:visibility="gone"
+        android:background="@drawable/outgoing_message_box"
         android:fontFamily="@font/sf"
         android:padding="10dp"
+        android:paddingEnd="30dp"
         android:text="Message"
-        android:textColor="@color/white"
-        android:textSize="15sp"
-        android:visibility="gone" />
+        android:textColor="@color/white" />
 
 </LinearLayout>

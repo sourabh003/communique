@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".views.Home">
+    tools:context=".views.ContactList">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
@@ -15,11 +15,11 @@
         app:contentInsetEnd="10dp">
 
         <ImageView
-            android:id="@+id/btn_user"
+            android:id="@+id/btn_back"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_account" />
+            android:src="@drawable/ic_back_arrow" />
 
 
         <TextView
@@ -28,43 +28,56 @@
             android:layout_gravity="center"
             android:fontFamily="@font/sf"
             android:gravity="center"
-            android:text="Communique"
+            android:text="Select Contact"
             android:textColor="@color/white"
             android:textSize="18sp" />
 
         <ImageView
-            android:id="@+id/btn_options"
+            android:id="@+id/btn_search"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:src="@drawable/ic_options" />
+            android:src="@drawable/ic_search_icon" />
+
+        <ImageView
+            android:id="@+id/btn_close_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:src="@drawable/ic_baseline_close_24"
+            android:visibility="gone" />
+
+        <ProgressBar
+            android:id="@+id/layout_loading"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="end"
+            android:visibility="gone" />
 
     </com.google.android.material.appbar.MaterialToolbar>
 
     <LinearLayout
-        android:id="@+id/layout_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar"
         android:layout_alignParentBottom="true"
         android:orientation="vertical">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/layout_recent_chat_list"
+        <EditText
+            android:id="@+id/search_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp" />
+            android:layout_margin="5dp"
+            android:visibility="gone"
+            android:fontFamily="@font/sf"
+            android:hint="Enter Contact Name" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/contact_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="5dp" />
 
     </LinearLayout>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btn_open_contact_list"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="10dp"
-        android:backgroundTint="@color/colorAccent"
-        android:src="@drawable/ic_add_chat" />
 
 </RelativeLayout>

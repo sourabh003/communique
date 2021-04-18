@@ -1,39 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/layout_parent"
     android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/layout_parent_view"
     android:orientation="horizontal"
-    android:padding="10dp"
-    android:background="@color/colorPrimary"
-    android:layout_height="wrap_content">
+    android:padding="15dp">
 
     <ImageView
-        android:id="@+id/layout_image"
+        android:id="@+id/image_profile"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_gravity="center"
-        android:layout_margin="10dp"
+        android:layout_gravity="center_vertical"
         android:src="@drawable/ic_account" />
 
     <TextView
-        android:id="@+id/layout_name"
-        android:layout_width="wrap_content"
-        android:layout_weight="1"
-        android:layout_height="wrap_content"
+        android:id="@+id/text_name"
+        android:layout_width="0dp"
         android:fontFamily="@font/sf"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
+        android:layout_marginStart="10dp"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
         android:text="Name"
-        android:textColor="@color/white"
-        android:textSize="20sp" />
-
-    <Button
-        android:id="@+id/layout_invite"
-        android:visibility="gone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAllCaps="false"
-        android:backgroundTint="@color/LimeGreen"
-        android:layout_margin="10dp"
-        android:text="Invite"/>
+        android:textColor="@color/gray" />
 
 </LinearLayout>
