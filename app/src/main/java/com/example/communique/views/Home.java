@@ -1,5 +1,6 @@
 package com.example.communique.views;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -11,6 +12,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -24,8 +26,14 @@ import com.example.communique.database.Database;
 import com.example.communique.helpers.User;
 import com.example.communique.utils.CircleTransform;
 import com.example.communique.utils.Constants;
+import com.example.communique.utils.FirebaseUtils;
 import com.example.communique.utils.Functions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -34,6 +42,7 @@ import java.util.List;
 
 public class Home extends AppCompatActivity implements View.OnClickListener {
 
+    private static final String TAG = "Home";
     RecyclerView recentChatListView;
     ImageView btnProfile, btnOptions;
     FloatingActionButton btnOpenContactList;
@@ -45,6 +54,9 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
     HashMap<String, String> newMessagesList = new HashMap<>();
     RecentChatListAdapter adapter;
 
+    DatabaseReference newMessagesNode = FirebaseDatabase.getInstance().getReference().child(FirebaseUtils.FIREBASE_RECENT_MESSAGES_NODE);
+    DatabaseReference incomingMessagesNode;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +64,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
 
         database = new Database(this);
         user = database.getUserDetails();
+        incomingMessagesNode = newMessagesNode.child(user.getUserPhone());
 
         btnOpenContactList = findViewById(R.id.btn_open_contact_list);
         btnOpenContactList.setOnClickListener(this);
@@ -63,21 +76,41 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
         recentChatListView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new RecentChatListAdapter(recentMessagesList, newMessagesList, this);
         recentChatListView.setAdapter(adapter);
-
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        if(!(user.getUserImage().isEmpty())){
+        if (!(user.getUserImage().isEmpty())) {
             Picasso.get().load(user.getUserImage()).transform(new CircleTransform()).into(btnProfile);
         }
 
+        newMessagesList.clear();
         recentMessagesList.clear();
         recentMessagesList.addAll(database.getRecentChats(user.getUserPhone()));
         adapter.notifyDataSetChanged();
+
+        incomingMessagesNode.addValueEventListener(newMessagesListener);
     }
+
+    ValueEventListener newMessagesListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(@NonNull DataSnapshot snapshot) {
+            for (DataSnapshot sender : snapshot.getChildren()) {
+                if (!(recentMessagesList.contains(sender.getKey()))) {
+                    recentMessagesList.add(sender.getKey());
+                }
+                newMessagesList.put(sender.getKey(), String.valueOf(sender.getChildrenCount()));
+            }
+            adapter.notifyDataSetChanged();
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError error) {
+            Log.e(TAG, "onCancelled: DatabaseError => " + error);
+        }
+    };
 
     @Override
     public void onClick(View v) {
@@ -116,7 +149,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
         switch (requestCode) {
             case Constants.READ_CONTACTS_PERMISSION_CODE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if(permissionDialog.isShowing()){
+                    if (permissionDialog.isShowing()) {
                         permissionDialog.hide();
                     }
                     startActivity(new Intent(this, ContactList.class));

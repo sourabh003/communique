@@ -94,10 +94,11 @@ public class Chat extends AppCompatActivity implements View.OnClickListener, Pop
             messageArray.add(message.getMessageTime());
             messageList.put(message.getMessageTime(), message);
             chatListAdapter.notifyDataSetChanged();
+            layoutChatListView.scrollToPosition(messageArray.size() - 1);
             new Thread(() -> {
                 if(database.saveMessageToDatabase(message)){
                     incomingMessageNode.child(message.getMessageTime()).setValue(null);
-                    newMessagesNode.child(user.getUserPhone()).child(recipient.getUserPhone()).child(message.getMessageTime()).setValue(message);
+                    newMessagesNode.child(user.getUserPhone()).child(recipient.getUserPhone()).child(message.getMessageTime()).setValue(null);
                 }
             }).start();
         }
@@ -130,6 +131,7 @@ public class Chat extends AppCompatActivity implements View.OnClickListener, Pop
         if(messageArray.size() != database.getMessagesFromDatabase(recipient.getUserPhone()).size()){
             messageList.putAll(database.getMessagesFromDatabase(recipient.getUserPhone()));
             messageArray.addAll(messageList.keySet());
+            layoutChatListView.scrollToPosition(messageList.size() - 1);
             chatListAdapter.notifyDataSetChanged();
         }
 
@@ -138,8 +140,8 @@ public class Chat extends AppCompatActivity implements View.OnClickListener, Pop
 
     @Override
     public void onBackPressed() {
-        incomingMessageNode.removeEventListener(incomingMessagesListener);
         super.onBackPressed();
+        incomingMessageNode.removeEventListener(incomingMessagesListener);
     }
 
     @Override

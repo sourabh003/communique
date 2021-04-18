@@ -50,9 +50,14 @@ public class RecentChatListAdapter extends RecyclerView.Adapter<RecentChatListAd
         String phone = recentChatList.get(position);
         User recipient = database.getContactByID("", phone);
         holder.layoutName.setText(Functions.decryptName(recipient.getUserName()));
+        if(holder.layoutCounter.getVisibility() == View.VISIBLE){
+            holder.layoutCounter.setVisibility(View.INVISIBLE);
+        }
         if (newMessageList.containsKey(phone)){
-            holder.layoutCounter.setText(newMessageList.get(phone));
-            holder.layoutCounter.setVisibility(View.VISIBLE);
+            if(Integer.parseInt(newMessageList.get(phone)) != 0){
+                holder.layoutCounter.setText(newMessageList.get(phone));
+                holder.layoutCounter.setVisibility(View.VISIBLE);
+            }
         }
         holder.layoutParentView.setOnClickListener(v -> {
             Intent intent = new Intent(context, Chat.class);
