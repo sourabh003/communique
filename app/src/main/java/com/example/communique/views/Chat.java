@@ -1,11 +1,14 @@
 package com.example.communique.views;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,14 +26,21 @@ import com.example.communique.database.Database;
 import com.example.communique.helpers.Message;
 import com.example.communique.helpers.User;
 import com.example.communique.utils.Constants;
+import com.example.communique.utils.FirebaseUtils;
 import com.example.communique.utils.Functions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
 
 public class Chat extends AppCompatActivity implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
 
+    private static final String TAG = "Chat";
     ImageView btnBack, btnUserImage, btnOptions;
     TextView layoutRecipientName;
     EditText layoutMessageBox;
@@ -43,6 +53,9 @@ public class Chat extends AppCompatActivity implements View.OnClickListener, Pop
     ArrayList<String> messageArray = new ArrayList<>();
     ChatListAdapter chatListAdapter;
 
+    DatabaseReference firebaseRootNode = FirebaseDatabase.getInstance().getReference();
+    DatabaseReference outgoingMessageNode, incomingMessageNode, newMessagesNode;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +65,9 @@ public class Chat extends AppCompatActivity implements View.OnClickListener, Pop
         database = new Database(this);
         recipient = database.getContactByID(getIntent().getExtras().getString(Constants.CONTACTID), "");
         user = database.getUserDetails();
+        newMessagesNode = firebaseRootNode.child(FirebaseUtils.FIREBASE_RECENT_MESSAGES_NODE);
+        outgoingMessageNode = firebaseRootNode.child(FirebaseUtils.USER_NODE).child(recipient.getUserPhone()).child(FirebaseUtils.MESSAGES_NODE);
+        incomingMessageNode = firebaseRootNode.child(FirebaseUtils.USER_NODE).child(user.getUserPhone()).child(FirebaseUtils.MESSAGES_NODE);
 
         btnBack = findViewById(R.id.btn_back);
         btnBack.setOnClickListener(this);
@@ -71,6 +87,42 @@ public class Chat extends AppCompatActivity implements View.OnClickListener, Pop
 
     }
 
+    ChildEventListener incomingMessagesListener = new ChildEventListener() {
+        @Override
+        public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            Message message = snapshot.getValue(Message.class);
+            messageArray.add(message.getMessageTime());
+            messageList.put(message.getMessageTime(), message);
+            chatListAdapter.notifyDataSetChanged();
+            new Thread(() -> {
+                if(database.saveMessageToDatabase(message)){
+                    incomingMessageNode.child(message.getMessageTime()).setValue(null);
+                    newMessagesNode.child(user.getUserPhone()).child(recipient.getUserPhone()).child(message.getMessageTime()).setValue(message);
+                }
+            }).start();
+        }
+
+        @Override
+        public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+        }
+
+        @Override
+        public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+        }
+
+        @Override
+        public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError error) {
+            Log.e(TAG, "onCancelled: DatabaseError => " + error);
+        }
+    };
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -80,6 +132,14 @@ public class Chat extends AppCompatActivity implements View.OnClickListener, Pop
             messageArray.addAll(messageList.keySet());
             chatListAdapter.notifyDataSetChanged();
         }
+
+        incomingMessageNode.addChildEventListener(incomingMessagesListener);
+    }
+
+    @Override
+    public void onBackPressed() {
+        incomingMessageNode.removeEventListener(incomingMessagesListener);
+        super.onBackPressed();
     }
 
     @Override
@@ -109,7 +169,11 @@ public class Chat extends AppCompatActivity implements View.OnClickListener, Pop
             );
             messageList.put(time, message);
             messageArray.add(time);
-            new Thread(() -> {database.saveMessageToDatabase(message);}).start();
+            new Thread(() -> {
+                database.saveMessageToDatabase(message);
+                outgoingMessageNode.child(time).setValue(message);
+                newMessagesNode.child(recipient.getUserPhone()).child(user.getUserPhone()).child(time).setValue(message);
+            }).start();
             layoutMessageBox.setText("");
             chatListAdapter.notifyItemInserted(messageList.size() - 1);
             layoutChatListView.scrollToPosition(messageList.size() - 1);
@@ -119,13 +183,11 @@ public class Chat extends AppCompatActivity implements View.OnClickListener, Pop
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.btn_clear_chat:
-                openConfirmationDialog();
-                return true;
-            default:
-                return false;
+        if (item.getItemId() == R.id.btn_clear_chat) {
+            openConfirmationDialog();
+            return true;
         }
+        return false;
     }
 
     private void openConfirmationDialog() {
