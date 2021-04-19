@@ -24,11 +24,13 @@ import com.squareup.picasso.Picasso;
 
 public class ProfileSetup extends AppCompatActivity implements View.OnClickListener {
 
+    //declaration of views
     ImageView layoutUserImage;
     TextView layoutUserEmail;
     EditText layoutUserName, layoutUserPhone;
     Button buttonSave;
 
+    //declaration of helpers
     Database database;
     User user;
     DatabaseReference userNode = FirebaseDatabase.getInstance().getReference().child(FirebaseUtils.USER_NODE);
@@ -38,9 +40,11 @@ public class ProfileSetup extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_setup);
 
+        //assignment of helpers
         database = new Database(this);
         user = database.getUserDetails();
 
+        //assignment of views
         layoutUserEmail = findViewById(R.id.layout_user_email);
         layoutUserEmail.setText(user.getUserEmail());
         layoutUserImage = findViewById(R.id.layout_user_image);
@@ -66,7 +70,7 @@ public class ProfileSetup extends AppCompatActivity implements View.OnClickListe
     private void saveDetails(String name, String phone) {
         if(!(name.isEmpty()) && !(phone.isEmpty())){
             if(phone.length() == 10){
-                phone = Constants.COUNTRY_CODE_INDIA + phone;
+                phone = Constants.COUNTRY_CODE_INDIA + phone; //adding country codes in phone number
                 String finalPhone = phone;
                 User updatedUser = new User(
                         user.getUid(),
@@ -75,6 +79,8 @@ public class ProfileSetup extends AppCompatActivity implements View.OnClickListe
                         user.getUserImage(),
                         finalPhone
                 );
+
+                //starting new thread so the main thread doesn't get slow
                 new Thread(() -> {
                     database.updateUserData(user.getUid(), name, finalPhone, user.getUserImage());
                     userNode.child(finalPhone).child(FirebaseUtils.USER_DETAILS_NODE).setValue(updatedUser);
