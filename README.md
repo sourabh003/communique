@@ -21,5 +21,5 @@ To integrate this app with your firebase database just replace the `google-servi
 ![Screenshot_1](https://user-images.githubusercontent.com/59859592/115279743-b7f4b000-a164-11eb-9ae3-61b785dcd168.png)
 
 ## Application Releases
-You can try out the apk if your android version is above 8.0 <br/>
+You can try out the apk if your android version is above 8.0 <br/>Note: This is a debug version of the app so you might get a prompt by google while installing the app<br/>
 APK link : https://drive.google.com/file/d/18qyTiavZ3UlkuC8TDF9R1hZ8EjhT6q84/view?usp=sharing
