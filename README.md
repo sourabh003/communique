@@ -12,4 +12,4 @@ Communique is built using the following stack
 ## Workflow
 Communique runs on an Android Device. When sending a message, the messages are sent to the Firebase Database then the target device fetches the message and save them to Sqlite database locally. 
 
-![Communique Workflow](https://drive.google.com/file/d/1gqJzdPszTVNqu1J9GwdqZgJaAvKM5h0N/view?usp=sharing)
+![communique workflow](https://user-images.githubusercontent.com/59859592/115279108-e756ed00-a163-11eb-8718-19edbebc8eb2.jpg)
