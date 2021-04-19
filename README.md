@@ -13,3 +13,8 @@ Communique is built using the following stack
 Communique runs on an Android Device. When sending a message, the messages are sent to the Firebase Database then the target device fetches the message and save them to Sqlite database locally. 
 
 ![communique workflow](https://user-images.githubusercontent.com/59859592/115279108-e756ed00-a163-11eb-8718-19edbebc8eb2.jpg)
+
+## Using the app with different Firebase Database
+Feel free to clone the code and use it as your liking. 
+To integrate this app with your firebase database just replace the `<google-services.json>` file in the app directory with your `<google-services.json>` file.
+![Screenshot_1](https://user-images.githubusercontent.com/59859592/115279743-b7f4b000-a164-11eb-9ae3-61b785dcd168.png)
