@@ -3,8 +3,9 @@
     android:id="@+id/layout_parent_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/colorLight"
     android:orientation="horizontal"
-    android:padding="15dp">
+    android:padding="10dp">
 
     <ImageView
         android:id="@+id/image_profile"
@@ -19,26 +20,25 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:layout_marginStart="10dp"
-        android:fontFamily="@font/sf"
         android:layout_weight="1"
+        android:fontFamily="@font/sf"
         android:gravity="center_vertical"
         android:text="Name"
-        android:textColor="@color/gray" />
+        android:textColor="@color/white" />
 
     <TextView
         android:id="@+id/text_counter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_gravity="center"
-        android:visibility="gone"
-        android:paddingStart="8dp"
-        android:fontFamily="@font/sf"
-        android:paddingEnd="8dp"
-        android:background="@drawable/background_circle_counter"
-        android:padding="5dp"
         android:layout_marginStart="10dp"
-        android:gravity="center_vertical"
+        android:background="@drawable/background_circle_counter"
+        android:fontFamily="@font/sf"
+        android:gravity="center"
+        android:padding="5dp"
+        android:textStyle="bold"
         android:text="0"
-        android:textColor="@color/white" />
+        android:textColor="@color/white"
+        android:visibility="gone" />
 
 </LinearLayout>

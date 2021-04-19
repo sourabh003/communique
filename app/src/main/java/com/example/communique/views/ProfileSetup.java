@@ -17,6 +17,7 @@ import com.example.communique.helpers.User;
 import com.example.communique.utils.CircleTransform;
 import com.example.communique.utils.Constants;
 import com.example.communique.utils.FirebaseUtils;
+import com.example.communique.utils.Functions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
@@ -57,6 +58,7 @@ public class ProfileSetup extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.button_save){
+            Functions.closeKeyboard(this, this);
             saveDetails(layoutUserName.getText().toString().trim(), layoutUserPhone.getText().toString().trim());
         }
     }

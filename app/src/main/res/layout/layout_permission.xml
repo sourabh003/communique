@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:elevation="12dp"
     android:layout_margin="10dp"
+    android:background="@color/colorDark"
     android:layout_height="wrap_content"
     tools:context=".views.Splash">
 
@@ -17,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@color/colorPrimaryDark"
+            android:background="@color/colorDark"
             android:orientation="vertical"
             android:padding="20dp">
 
@@ -35,6 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
+            android:background="@color/colorWhite"
             android:padding="5dp">
 
             <TextView
@@ -63,12 +65,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:backgroundTint="@color/colorPrimaryDark"
+                android:backgroundTint="@color/colorAccent"
                 android:fontFamily="@font/sf"
                 android:padding="15dp"
                 android:text="Continue"
                 android:textAllCaps="false"
-                android:textColor="@color/white" />
+                android:textColor="@color/black" />
 
         </LinearLayout>
 

@@ -8,6 +8,9 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
+    <color name="colorLight">#434356</color>
+    <color name="colorWhite">#C4DCDF</color>
+    <color name="colorDark">#1C1C28</color>
     <color name="colorPrimaryDark">#003C6B</color>
     <color name="colorPrimary">#008ED6</color>
     <color name="colorAccent">#F79303</color>
@@ -168,5 +171,6 @@
     <color name="DarkBlue">#00008B</color>
     <color name="Navy">#000080</color>
     <color name="Black">#000000</color>
+    <color name="incomingMessageBox">#224E73</color>
 
 </resources>

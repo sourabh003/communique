@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorLight"
     tools:context=".views.ContactList">
 
     <com.google.android.material.appbar.MaterialToolbar
@@ -11,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:layout_alignParentStart="true"
-        android:background="@color/colorPrimaryDark"
+        android:background="@color/colorDark"
         app:contentInsetEnd="10dp">
 
         <ImageView
@@ -68,6 +69,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
+            android:background="@drawable/login_page_input_box"
+            android:padding="10dp"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            android:textColorHint="@color/gray"
             android:visibility="gone"
             android:fontFamily="@font/sf"
             android:hint="Enter Contact Name" />

@@ -4,28 +4,30 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorLight"
     tools:context=".views.Chat">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        app:contentInsetStart="0dp"
         android:layout_alignParentStart="true"
-        android:background="@color/colorPrimaryDark"
-        app:contentInsetEnd="10dp">
+        android:background="@color/colorDark">
 
         <ImageView
             android:id="@+id/btn_back"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:padding="5dp"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_back_arrow" />
 
         <ImageView
             android:id="@+id/btn_user_image"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginStart="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:padding="5dp"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_account" />
 
@@ -45,7 +47,7 @@
         <ImageView
             android:id="@+id/btn_options"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_gravity="end"
             android:src="@drawable/ic_options" />
 
@@ -62,9 +64,9 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/layout_chat_list_view"
             android:layout_width="match_parent"
+            android:paddingTop="5dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:padding="10dp" />
+            android:layout_alignParentBottom="true"/>
 
     </RelativeLayout>
 
@@ -72,14 +74,19 @@
         android:id="@+id/layout_actions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/colorLight"
         android:layout_alignParentBottom="true"
-        android:padding="5dp">
+        android:padding="10dp">
 
         <EditText
             android:id="@+id/layout_message_box"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:textColorHint="@color/gray"
             android:layout_weight="1"
+            android:paddingStart="10dp"
+            android:background="@drawable/login_page_input_box"
+            android:textColor="@color/black"
             android:fontFamily="@font/sf"
             android:hint="Type a Message" />
 
@@ -87,7 +94,7 @@
             android:id="@+id/btn_send"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
+            android:layout_marginStart="10dp"
             android:backgroundTint="@color/colorAccent"
             android:src="@drawable/ic_baseline_send_24" />
 

@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorLight"
     tools:context=".views.Home">
 
     <com.google.android.material.appbar.MaterialToolbar
@@ -12,7 +13,7 @@
         android:layout_height="?attr/actionBarSize"
         android:layout_alignParentStart="true"
         app:contentInsetStart="0dp"
-        android:background="@color/colorPrimaryDark">
+        android:background="@color/colorDark">
 
         <ImageView
             android:id="@+id/btn_user"
