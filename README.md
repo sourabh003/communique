@@ -17,4 +17,5 @@ Communique runs on an Android Device. When sending a message, the messages are s
 ## Using the app with different Firebase Database
 Feel free to clone the code and use it as your liking. 
 To integrate this app with your firebase database just replace the `<google-services.json>` file in the app directory with your `<google-services.json>` file.
+
 ![Screenshot_1](https://user-images.githubusercontent.com/59859592/115279743-b7f4b000-a164-11eb-9ae3-61b785dcd168.png)
