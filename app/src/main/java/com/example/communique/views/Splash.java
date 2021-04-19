@@ -36,7 +36,11 @@ public class Splash extends AppCompatActivity {
 
     private void jumpWithDelay() {
         if(user != null){
-            startActivity(new Intent(this, Home.class));
+            if(user.getUserPhone().isEmpty()){
+                startActivity(new Intent(this, ProfileSetup.class));
+            } else {
+                startActivity(new Intent(this, Home.class));
+            }
         } else {
             startActivity(new Intent(this, Login.class));
         }
